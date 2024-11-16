@@ -1,12 +1,15 @@
 /*
 * Criar dois arquivos: um para ranking e um para carregar as palavras
-* Pedir credenciais de usuÃ¡rio
-* Menu principal com crÃ©ditos, ranking, cadastrar palavra, sair e jogar
+* Pedir credenciais de usuário
+* Menu principal com créditos, ranking, cadastrar palavra, sair e jogar
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <locale.h>
 #include <ctype.h>
+#include <time.h>
+#include <string.h>
 
 void desenharMenu();
 const char* escolhePalavra();
@@ -16,7 +19,7 @@ int main () {
 	int acertouPalavra = 0, erros = 0, opcao;
 	
 	desenharMenu();
-	printf("Digite uma opÃ§Ã£o: ");
+	printf("Digite uma opção: ");
 	
 	do {
 		scanf("%d", &opcao);
@@ -25,12 +28,14 @@ int main () {
 			case 1: {
 				// validaUsuario();
 				const char* palavraEscolhida = escolhePalavra();
-				while (!acertouPalavra && erros < 6) {
+				printf("%s", palavraEscolhida);
+				//while (!acertouPalavra && erros < 6) {
 					// desenhaForca();
 					// desenhaPalavra();
 					// validaLetra();
-				}
+				//}
 				// calculaPontuacao();
+				free((void*)palavraEscolhida);
 				}
 				break;
 			case 2:
@@ -47,18 +52,72 @@ int main () {
 				return 1;
 				break;
 			default:
-				printf("Digite um valor vÃ¡lido: ");
+				printf("Digite um valor válido: ");
 		}
 	} while (opcao < 1 || opcao > 5);
 	
 	return 0;
 }
 
+void desenharMenu() {
+	printf("====================\n");
+	printf("1. Jogar\n");
+	printf("2. Ver Ranking\n");
+	printf("3. Cadastrar Palavra\n");
+	printf("4. Créditos\n");
+	printf("5. Sair\n");
+	printf("====================\n\n");
+}
+
+const char* escolhePalavra() {
+    FILE* arquivo_palavras = fopen("dict.txt", "r");
+    if (!arquivo_palavras) {
+        printf("Erro ao abrir o arquivo\n");
+        return NULL;
+    }
+
+    int total_palavras = 0;
+    char buffer[100];
+    while (fscanf(arquivo_palavras, "%99s", buffer) == 1) {
+        total_palavras++;
+    }
+
+    if (total_palavras == 0) {
+        printf("Arquivo vazio ou sem palavras válidas.\n");
+        fclose(arquivo_palavras);
+        return NULL;
+    }
+
+    srand(time(NULL));
+    int indice_aleatorio = rand() % total_palavras;
+
+    rewind(arquivo_palavras);
+
+    int contador = 0;
+    char* palavra_escolhida = NULL;
+    while (fscanf(arquivo_palavras, "%99s", buffer) == 1) {
+        if (contador == indice_aleatorio) {
+            palavra_escolhida = (char*)malloc(strlen(buffer) + 1);
+            if (!palavra_escolhida) {
+                printf("Erro de alocação de memória.\n");
+                fclose(arquivo_palavras);
+                return NULL;
+            }
+            strcpy(palavra_escolhida, buffer);
+            break;
+        }
+        contador++;
+    }
+
+    fclose(arquivo_palavras);
+    return palavra_escolhida;
+}
+
 
 
 /*]
 void validaUsuario() {
-	Pede o nome do usuÃ¡rio. Se nÃ£o existir, opÃ§Ã£o de cadastrar. Se existir, confirmar entrada
+	Pede o nome do usuï¿½rio. Se nï¿½o existir, opï¿½ï¿½o de cadastrar. Se existir, confirmar entrada
 }
 
 void cadastrarPalavra() {
@@ -85,7 +144,7 @@ void desenhaPalavra() {
 }
 
 void calculaPontuacao() {
-	Calcula a pontuaÃ§Ã£o com base nos erros do usuÃ¡rio. Cada acerto de letra dÃ¡ 100 pontos e cada letra errada perde 50. Acertar a palavra completa dÃ¡ 300 pontos.
+	Calcula a pontuaï¿½ï¿½o com base nos erros do usuï¿½rio. Cada acerto de letra dï¿½ 100 pontos e cada letra errada perde 50. Acertar a palavra completa dï¿½ 300 pontos.
 }
 
 void exibirRanking() {
@@ -93,21 +152,7 @@ void exibirRanking() {
 }
 
 void exibirCreditos() {
-	Exibe os crÃ©ditos
+	Exibe os crï¿½ditos
 }
 */
 
-const char* escolhePalavra() {
-	// Pega uma palavra do arquivo .txt aleatoriamente (provavelmente usar o fread) e alocar dinamicamente
-	return "teste";
-}
-
-void desenharMenu() {
-	printf("====================\n");
-	printf("1. Jogar\n");
-	printf("2. Ver Ranking\n");
-	printf("3. Cadastrar Palavra\n");
-	printf("4. CrÃ©ditos\n");
-	printf("5. Sair\n");
-	printf("====================\n\n");
-}
