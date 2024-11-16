@@ -8,11 +8,8 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <ctype.h>
-<<<<<<< HEAD
-=======
-#include <time.h>
->>>>>>> origin/main
 #include <string.h>
+#include <time.h>
 
 void desenharMenu();
 const char* escolhePalavra();
@@ -39,13 +36,10 @@ int main () {
 				//while (!acertouPalavra && erros < 6) {
 					// desenhaForca();
 					// desenhaPalavra();
-<<<<<<< HEAD
 					validaLetra(palavraEscolhida);
 				}
-=======
 					// validaLetra();
 				//}
->>>>>>> origin/main
 				// calculaPontuacao();
 				free((void*)palavraEscolhida);
 				}
@@ -109,6 +103,7 @@ int atualizarLetrasAdivinhadas(char letrasAdvinhadas[], int *numAdvinhacoes, cha
 		letrasAdvinhadas[*numAdvinhacoes] = letraAdvinhada;
 		(*numAdvinhacoes)++;
 	}
+}
 =======
 void desenharMenu() {
 	printf("====================\n");
@@ -188,13 +183,10 @@ void desenhaForca(erros) {
 }
 
 void validaLetra() {
-<<<<<<< HEAD
 
 scanf()
 	
-=======
 	Verifica se a letra escolhida está presente na palavra misteriosa e exibe as letras que já foram usadas. Impedir que a mesma letra seja usada
->>>>>>> origin/main
 }
 
 void desenhaPalavra() {
