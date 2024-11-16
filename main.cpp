@@ -1,7 +1,7 @@
 /*
 * Criar dois arquivos: um para ranking e um para carregar as palavras
-* Pedir credenciais de usu�rio
-* Menu principal com cr�ditos, ranking, cadastrar palavra, sair e jogar
+* Pedir credenciais de usuário
+* Menu principal com créditos, ranking, cadastrar palavra, sair e jogar
 */
 
 #include <stdio.h>
@@ -19,7 +19,7 @@ int main () {
 	int acertouPalavra = 0, erros = 0, opcao;
 	
 	desenharMenu();
-	printf("Digite uma op��o: ");
+	printf("Digite uma opção: ");
 	
 	do {
 		scanf("%d", &opcao);
@@ -52,7 +52,7 @@ int main () {
 				return 1;
 				break;
 			default:
-				printf("Digite um valor v�lido: ");
+				printf("Digite um valor válido: ");
 		}
 	} while (opcao < 1 || opcao > 5);
 	
@@ -64,7 +64,7 @@ void desenharMenu() {
 	printf("1. Jogar\n");
 	printf("2. Ver Ranking\n");
 	printf("3. Cadastrar Palavra\n");
-	printf("4. Cr�ditos\n");
+	printf("4. Créditos\n");
 	printf("5. Sair\n");
 	printf("====================\n\n");
 }
@@ -83,7 +83,7 @@ const char* escolhePalavra() {
     }
 
     if (total_palavras == 0) {
-        printf("Arquivo vazio ou sem palavras v�lidas.\n");
+        printf("Arquivo vazio ou sem palavras válidas.\n");
         fclose(arquivo_palavras);
         return NULL;
     }
@@ -99,7 +99,7 @@ const char* escolhePalavra() {
         if (contador == indice_aleatorio) {
             palavra_escolhida = (char*)malloc(strlen(buffer) + 1);
             if (!palavra_escolhida) {
-                printf("Erro de aloca��o de mem�ria.\n");
+                printf("Erro de alocação de memória.\n");
                 fclose(arquivo_palavras);
                 return NULL;
             }
@@ -115,9 +115,9 @@ const char* escolhePalavra() {
 
 
 
-/*]
+/*
 void validaUsuario() {
-	Pede o nome do usu�rio. Se n�o existir, op��o de cadastrar. Se existir, confirmar entrada
+	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
 }
 
 void cadastrarPalavra() {
@@ -136,7 +136,7 @@ void desenhaForca(erros) {
 }
 
 void validaLetra() {
-	Verifica se a letra escolhida est� presente na palavra misteriosa e exibe as letras que j� foram usadas. Impedir que a mesma letra seja usada
+	Verifica se a letra escolhida está presente na palavra misteriosa e exibe as letras que já foram usadas. Impedir que a mesma letra seja usada
 }
 
 void desenhaPalavra() {
@@ -144,7 +144,7 @@ void desenhaPalavra() {
 }
 
 void calculaPontuacao() {
-	Calcula a pontua��o com base nos erros do usu�rio. Cada acerto de letra d� 100 pontos e cada letra errada perde 50. Acertar a palavra completa d� 300 pontos.
+	Calcula a pontuação com base nos erros do usu�rio. Cada acerto de letra dá 100 pontos e cada letra errada perde 50. Acertar a palavra completa dá 300 pontos.
 }
 
 void exibirRanking() {
@@ -152,7 +152,7 @@ void exibirRanking() {
 }
 
 void exibirCreditos() {
-	Exibe os cr�ditos
+	Exibe os créditos
 }
 */
 
