@@ -34,13 +34,13 @@ int main () {
 				const char* palavraEscolhida = escolhePalavra();
 				printf("%s", palavraEscolhida);
 				//while (!acertouPalavra && erros < 6) {
-					// desenhaForca();
-					// desenhaPalavra();
+				// desenhaForca();
+				// desenhaPalavra();
 					validaLetra(palavraEscolhida);
-				}
 					// validaLetra();
-				//}
+				
 				// calculaPontuacao();
+				//}
 				free((void*)palavraEscolhida);
 				}
 				break;
@@ -65,8 +65,7 @@ int main () {
 	return 0;
 }
 
-<<<<<<< HEAD
-int validaLetra(const char *palavra)
+/*int validaLetra(const char *palavra)
 {
 	char letra;
 	scanf(" %c", &letra);
@@ -87,78 +86,23 @@ int validaLetra(const char *palavra)
 	}
 	else
 	{
-
+		return;
 	}
-}
+}*/
 
-int atualizarLetrasAdivinhadas(char letrasAdvinhadas[], int *numAdvinhacoes, char letraAdvinhada)
+/*int atualizarLetrasAdivinhadas(char letrasAdvinhadas[], int *numAdvinhacoes, char letraAdvinhada)
 {
 	//verificar se letra ja foi inserida antes
 	for (int i = 0; i < *numAdvinhacoes; i++) {
 		if (letrasAdvinhadas[i] == letraAdvinhada) {
 			printf("Essa letra já foi inserida");
-			return;
+			return 0;
 		}
 
 		letrasAdvinhadas[*numAdvinhacoes] = letraAdvinhada;
 		(*numAdvinhacoes)++;
 	}
-}
-=======
-void desenharMenu() {
-	printf("====================\n");
-	printf("1. Jogar\n");
-	printf("2. Ver Ranking\n");
-	printf("3. Cadastrar Palavra\n");
-	printf("4. Créditos\n");
-	printf("5. Sair\n");
-	printf("====================\n\n");
-}
-
-const char* escolhePalavra() {
-    FILE* arquivo_palavras = fopen("dict.txt", "r");
-    if (!arquivo_palavras) {
-        printf("Erro ao abrir o arquivo\n");
-        return NULL;
-    }
-
-    int total_palavras = 0;
-    char buffer[100];
-    while (fscanf(arquivo_palavras, "%99s", buffer) == 1) {
-        total_palavras++;
-    }
-
-    if (total_palavras == 0) {
-        printf("Arquivo vazio ou sem palavras válidas.\n");
-        fclose(arquivo_palavras);
-        return NULL;
-    }
-
-    srand(time(NULL));
-    int indice_aleatorio = rand() % total_palavras;
-
-    rewind(arquivo_palavras);
-
-    int contador = 0;
-    char* palavra_escolhida = NULL;
-    while (fscanf(arquivo_palavras, "%99s", buffer) == 1) {
-        if (contador == indice_aleatorio) {
-            palavra_escolhida = (char*)malloc(strlen(buffer) + 1);
-            if (!palavra_escolhida) {
-                printf("Erro de alocação de memória.\n");
-                fclose(arquivo_palavras);
-                return NULL;
-            }
-            strcpy(palavra_escolhida, buffer);
-            break;
-        }
-        contador++;
-    }
-
-    fclose(arquivo_palavras);
-    return palavra_escolhida;
->>>>>>> origin/main
-}
+}*/
 
 
 
