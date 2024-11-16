@@ -7,13 +7,18 @@
 #include <stdio.h>
 #include <locale.h>
 #include <ctype.h>
+#include <string.h>
 
 void desenharMenu();
 const char* escolhePalavra();
+int validaLetra(const char* palavra);
+int atualizarLetrasAdivinhadas(char letrasAdvinhadas[], int *numAdvinhacoes, char letraAdvinhada);
 
 int main () {
 	setlocale(0, "Portuguese");
-	int acertouPalavra = 0, erros = 0, opcao;
+	int acertouPalavra = 0, erros = 0, opcao, numAdvinhacoes = 0;
+	char letrasAdvinhadas[26] = {0};
+	
 	
 	desenharMenu();
 	printf("Digite uma opção: ");
@@ -28,7 +33,7 @@ int main () {
 				while (!acertouPalavra && erros < 6) {
 					// desenhaForca();
 					// desenhaPalavra();
-					// validaLetra();
+					validaLetra(palavraEscolhida);
 				}
 				// calculaPontuacao();
 				}
@@ -54,6 +59,44 @@ int main () {
 	return 0;
 }
 
+int validaLetra(const char *palavra)
+{
+	char letra;
+	scanf(" %c", &letra);
+	if(isalpha(letra))
+	{
+		for (int i = 0; i < strlen(palavra); i++)
+		{
+			if ( toupper(letra) == palavra[i])
+			{
+				
+				return i;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+	}
+	else
+	{
+
+	}
+}
+
+int atualizarLetrasAdivinhadas(char letrasAdvinhadas[], int *numAdvinhacoes, char letraAdvinhada)
+{
+	//verificar se letra ja foi inserida antes
+	for (int i = 0; i < *numAdvinhacoes; i++) {
+		if (letrasAdvinhadas[i] == letraAdvinhada) {
+			printf("Essa letra já foi inserida");
+			return;
+		}
+
+		letrasAdvinhadas[*numAdvinhacoes] = letraAdvinhada;
+		(*numAdvinhacoes)++;
+	}
+}
 
 
 /*]
@@ -77,7 +120,9 @@ void desenhaForca(erros) {
 }
 
 void validaLetra() {
-	Verifica se a letra escolhida est� presente na palavra misteriosa e exibe as letras que j� foram usadas. Impedir que a mesma letra seja usada
+
+scanf()
+	
 }
 
 void desenhaPalavra() {
