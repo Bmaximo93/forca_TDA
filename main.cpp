@@ -1,34 +1,22 @@
 /*
 * Criar dois arquivos: um para ranking e um para carregar as palavras
-* Pedir credenciais de usu·rio
-* Menu principal com crÈditos, ranking, cadastrar palavra, sair e jogar
+* Pedir credenciais de usu√°rio
+* Menu principal com cr√©ditos, ranking, cadastrar palavra, sair e jogar
 */
 
 #include <stdio.h>
 #include <locale.h>
 #include <ctype.h>
 
-void desenharMenu() {
-	printf("====================\n");
-	printf("1. Jogar\n");
-	printf("2. Ver Ranking\n");
-	printf("3. Cadastrar Palavra\n");
-	printf("4. CrÈditos\n");
-	printf("5. Sair\n");
-	printf("====================\n\n");
-}
-
-const char* escolhePalavra() {
-	// Pega uma palavra do arquivo .txt aleatoriamente (provavelmente usar o fread) e alocar dinamicamente
-	return "teste";
-}
+void desenharMenu();
+const char* escolhePalavra();
 
 int main () {
 	setlocale(0, "Portuguese");
 	int acertouPalavra = 0, erros = 0, opcao;
 	
 	desenharMenu();
-	printf("Digite uma opÁ„o: ");
+	printf("Digite uma op√ß√£o: ");
 	
 	do {
 		scanf("%d", &opcao);
@@ -59,7 +47,7 @@ int main () {
 				return 1;
 				break;
 			default:
-				printf("Digite um valor v·lido: ");
+				printf("Digite um valor v√°lido: ");
 		}
 	} while (opcao < 1 || opcao > 5);
 	
@@ -70,7 +58,7 @@ int main () {
 
 /*]
 void validaUsuario() {
-	Pede o nome do usu·rio. Se n„o existir, opÁ„o de cadastrar. Se existir, confirmar entrada
+	Pede o nome do usu√°rio. Se n√£o existir, op√ß√£o de cadastrar. Se existir, confirmar entrada
 }
 
 void cadastrarPalavra() {
@@ -89,7 +77,7 @@ void desenhaForca(erros) {
 }
 
 void validaLetra() {
-	Verifica se a letra escolhida est· presente na palavra misteriosa e exibe as letras que j· foram usadas. Impedir que a mesma letra seja usada
+	Verifica se a letra escolhida estÔøΩ presente na palavra misteriosa e exibe as letras que jÔøΩ foram usadas. Impedir que a mesma letra seja usada
 }
 
 void desenhaPalavra() {
@@ -97,7 +85,7 @@ void desenhaPalavra() {
 }
 
 void calculaPontuacao() {
-	Calcula a pontuaÁ„o com base nos erros do usu·rio. Cada acerto de letra d· 100 pontos e cada letra errada perde 50. Acertar a palavra completa d· 300 pontos.
+	Calcula a pontua√ß√£o com base nos erros do usu√°rio. Cada acerto de letra d√° 100 pontos e cada letra errada perde 50. Acertar a palavra completa d√° 300 pontos.
 }
 
 void exibirRanking() {
@@ -105,7 +93,21 @@ void exibirRanking() {
 }
 
 void exibirCreditos() {
-	Exibe os crÈditos
+	Exibe os cr√©ditos
 }
 */
 
+const char* escolhePalavra() {
+	// Pega uma palavra do arquivo .txt aleatoriamente (provavelmente usar o fread) e alocar dinamicamente
+	return "teste";
+}
+
+void desenharMenu() {
+	printf("====================\n");
+	printf("1. Jogar\n");
+	printf("2. Ver Ranking\n");
+	printf("3. Cadastrar Palavra\n");
+	printf("4. Cr√©ditos\n");
+	printf("5. Sair\n");
+	printf("====================\n\n");
+}
