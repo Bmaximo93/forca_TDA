@@ -13,6 +13,12 @@
 
 void desenharMenu();
 const char* escolhePalavra();
+bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
+int validaLetra(const char *palavra);
+void desenhaPalavra(const char *palavra, char letrasAdvinhadas[]);
+
+char letrasAdivinhadas[26] = {'\0'}; 
+int numAdivinhacoes = 0;
 
 int main () {
 	setlocale(0, "Portuguese");
@@ -28,12 +34,12 @@ int main () {
 			case 1: {
 				// validaUsuario();
 				const char* palavraEscolhida = escolhePalavra();
-				printf("%s", palavraEscolhida);
-				//while (!acertouPalavra && erros < 6) {
+				printf("\n%s\n\n", palavraEscolhida);
+				while (!acertouPalavra && erros < 6) {
 					// desenhaForca();
-					// desenhaPalavra();
-					// validaLetra();
-				//}
+					desenhaPalavra(palavraEscolhida, letrasAdivinhadas);
+					validaLetra(palavraEscolhida);
+				}
 				// calculaPontuacao();
 				free((void*)palavraEscolhida);
 				}
@@ -115,6 +121,105 @@ const char* escolhePalavra() {
 
 
 
+int validaLetra(const char *palavra)
+{
+	char letra;
+
+	do{
+
+	printf("\ninsira uma letra: ");
+	scanf(" %c", &letra);
+	letra = toupper(letra);
+
+	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
+	
+		
+	for (int i = 0; i < strlen(palavra); i++)
+	{
+
+		if (letra == palavra[i])
+		{
+				
+			return i;
+		}
+
+	}
+	
+	return -1;
+}
+
+bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra)
+{
+	//verificar se o que foi inserido foi uma letra
+	if (!isalpha(letra))
+	{
+		return false;
+	}
+	//verificar se letra ja foi inserida antes
+	for (int i = 0; i < 26; i++) 
+	{
+
+		if (letrasAdivinhadas[i] == letra)
+		{
+			printf("\na letra %c já foi inserida\n", letra);
+			return false;
+		}
+		
+	}
+	letrasAdivinhadas[*numAdivinhacoes] = letra;
+	(*numAdivinhacoes)++;
+	return true;
+}
+
+void desenhaPalavra(const char *palavra, char letrasAdvinhadas[])
+{
+	
+
+	#ifdef _WIN32
+        system("cls");  // Windows-specific command
+    #else
+        system("clear");  // Unix/Linux/MacOS-specific command
+    #endif
+
+	printf("(teste: a palavra é %s)",palavra);
+	printf("\n\n");
+
+	for (int i = 0; i < strlen(palavra); i++)
+	{
+		bool letraEncontrada = false;
+
+		for (int j = 0; letrasAdvinhadas[j] != '\0'; j++)
+		{
+			if (palavra[i] == letrasAdvinhadas[j])
+			{
+				printf("%c", palavra[i]);
+				letraEncontrada = true;
+				break;
+			}
+		}
+		
+		if (!letraEncontrada)
+		{
+			printf("_");
+		}
+
+		printf(" ");
+	}
+
+	printf("\n");
+	if(letrasAdivinhadas[0] != '\0')
+	{
+	printf("\nletras inseridas: ");
+	for(int i = 0; i < letrasAdivinhadas[i] != '\0'; i++)
+	{
+		printf("%c ", letrasAdivinhadas[i]);
+	}
+	}
+
+}
+
+
+
 /*
 void validaUsuario() {
 	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
@@ -135,13 +240,6 @@ void desenhaForca(erros) {
 =========
 }
 
-void validaLetra() {
-	Verifica se a letra escolhida está presente na palavra misteriosa e exibe as letras que já foram usadas. Impedir que a mesma letra seja usada
-}
-
-void desenhaPalavra() {
-	Mostra as palavras conhecidas e desconhecidas como _ _ A _ _ B _
-}
 
 void calculaPontuacao() {
 	Calcula a pontuação com base nos erros do usu�rio. Cada acerto de letra dá 100 pontos e cada letra errada perde 50. Acertar a palavra completa dá 300 pontos.
