@@ -14,15 +14,16 @@
 void desenharMenu();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
-int validaLetra(const char *palavra);
+int validaLetra(const char *palavra, int *erros);
 void desenhaPalavra(const char *palavra, char letrasAdvinhadas[]);
 
+int acertouPalavra = 0, erros = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
 int numAdivinhacoes = 0;
 
 int main () {
 	setlocale(0, "Portuguese");
-	int acertouPalavra = 0, erros = 0, opcao;
+	int opcao;
 	
 	desenharMenu();
 	printf("Digite uma opção: ");
@@ -35,10 +36,11 @@ int main () {
 				// validaUsuario();
 				const char* palavraEscolhida = escolhePalavra();
 				printf("\n%s\n\n", palavraEscolhida);
-				while (!acertouPalavra && erros < 6) {
+				while (!acertouPalavra && erros < 6) 
+				{
 					// desenhaForca();
 					desenhaPalavra(palavraEscolhida, letrasAdivinhadas);
-					validaLetra(palavraEscolhida);
+					validaLetra(palavraEscolhida, &erros);
 				}
 				// calculaPontuacao();
 				free((void*)palavraEscolhida);
@@ -121,15 +123,15 @@ const char* escolhePalavra() {
 
 
 
-int validaLetra(const char *palavra)
+int validaLetra(const char *palavra, int *erros)
 {
 	char letra;
 
 	do{
 
-	printf("\ninsira uma letra: ");
-	scanf(" %c", &letra);
-	letra = toupper(letra);
+		printf("\ninsira uma letra: ");
+		scanf(" %c", &letra);
+		letra = toupper(letra);
 
 	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
 	
@@ -145,6 +147,7 @@ int validaLetra(const char *palavra)
 
 	}
 	
+	(*erros)++;
 	return -1;
 }
 
@@ -176,12 +179,13 @@ void desenhaPalavra(const char *palavra, char letrasAdvinhadas[])
 	
 
 	#ifdef _WIN32
-        system("cls");  // Windows-specific command
+        system("cls");  
     #else
-        system("clear");  // Unix/Linux/MacOS-specific command
+        system("clear"); 
     #endif
 
-	printf("(teste: a palavra é %s)",palavra);
+	printf("(teste: a palavra é %s\n)",palavra);
+	printf("(teste: n de erros %i)", erros);
 	printf("\n\n");
 
 	for (int i = 0; i < strlen(palavra); i++)
