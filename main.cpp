@@ -230,6 +230,7 @@ int validaLetra(const char *palavra, int *erros, int *acertos)
 
 		printf("\ninsira uma letra: ");
 		scanf(" %c", &letra);
+		fflush(stdin);
 		letra = toupper(letra);
 
 	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
