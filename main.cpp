@@ -126,6 +126,7 @@ const char* escolhePalavra() {
 int validaLetra(const char *palavra, int *erros)
 {
 	char letra;
+
 	do{
 
 		printf("\ninsira uma letra: ");
@@ -256,4 +257,3 @@ void exibirCreditos() {
 	Exibe os créditos
 }
 */
-
