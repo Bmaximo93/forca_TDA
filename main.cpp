@@ -124,7 +124,6 @@ const char* escolhePalavra() {
 int validaLetra(const char *palavra)
 {
 	char letra;
-
 	do{
 
 	printf("\ninsira uma letra: ");
