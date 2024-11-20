@@ -17,13 +17,16 @@ void desenharMenu();
 void validaUsuario();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
-int validaLetra(const char *palavra, int *erros);
+int validaLetra(const char *palavra, int *erros, int *acertos);
 void desenhaGraficos(const char *palavra, char letrasAdvinhadas[]);
 int desenhaForca(int erros);
+int rodarPartida();
+bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
 
-int acertouPalavra = 0, erros = 0;
+int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
 int numAdivinhacoes = 0;
+
 
 int main () {
 	setlocale(0, "Portuguese");
@@ -38,15 +41,7 @@ int main () {
 		switch (opcao) {
 			case 1: {
 				validaUsuario();
-				const char* palavraEscolhida = escolhePalavra();
-				printf("\n%s\n\n", palavraEscolhida);
-				while (!acertouPalavra && erros < 6) 
-				{
-					desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
-					validaLetra(palavraEscolhida, &erros);
-				}
-				// calculaPontuacao();
-				free((void*)palavraEscolhida);
+				rodarPartida();
 				}
 				break;
 			case 2:
@@ -70,6 +65,34 @@ int main () {
 	return 0;
 }
 
+int rodarPartida()
+{
+	
+	const char* palavraEscolhida = escolhePalavra();
+
+	while (!acertouPalavra && erros < 6) 
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		validaLetra(palavraEscolhida, &erros, &acertos);
+		if (checaVitoria(palavraEscolhida, letrasAdivinhadas))
+		{
+			acertouPalavra = true; // da pra otimizar isso, o acertouPalavra poderia ser definido direto na função checaVitoria sem precisar dessa condicional .BM
+		}
+	}
+	if(acertouPalavra) //professor se voce estiver vendo isso me desculpe
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		printf("\n\nVoce Acertou :)\n\n");
+	}
+	else
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		printf("\n\nVoce Fracassou :(\n\n");
+	}
+	// calculaPontuacao();
+	free((void*)palavraEscolhida);
+	return 0;
+}
 
 void desenharMenu() {
 	printf("====================\n");
@@ -133,8 +156,6 @@ void validaUsuario() {
     char resposta;
     int encontrado = 0;
 
-<<<<<<< HEAD
-=======
     FILE *arquivo;
 
     do {
@@ -201,8 +222,7 @@ void validaUsuario() {
     }
 }
 
->>>>>>> main
-int validaLetra(const char *palavra, int *erros)
+int validaLetra(const char *palavra, int *erros, int *acertos)
 {
 	char letra;
 
@@ -220,7 +240,7 @@ int validaLetra(const char *palavra, int *erros)
 
 		if (letra == palavra[i])
 		{
-				
+			(*acertos)++;	
 			return i;
 		}
 
@@ -253,7 +273,7 @@ bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, 
 	return true;
 }
 
-void desenhaGraficos(const char *palavra, char letrasAdvinhadas[], bool gameover)
+void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 {
 	
 
@@ -268,7 +288,8 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[], bool gameover
 	printf("\n\n");
 
 	desenhaForca(erros);
-
+	if (erros < 6)
+	{
 	for (int i = 0; i < strlen(palavra); i++)
 	{
 		bool letraEncontrada = false;
@@ -300,10 +321,19 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[], bool gameover
 		printf("%c ", letrasAdivinhadas[i]);
 	}
 	}
+	}
+	else
+	{
+		for (int i = 0; i < strlen(palavra); i++)
+		{
+			printf("%c ", palavra[i]);
+		}
+	}
+	
 
 }
 
-int desenhaForca(int erros, bool gameover) //passar erros como parametro? talvez não seja necessário, discutir
+int desenhaForca(int erros) //passar erros como parametro? talvez não seja necessário, discutir
 {
 	printf("  +---+\n");
 	printf("  |   |\n");
@@ -315,6 +345,30 @@ int desenhaForca(int erros, bool gameover) //passar erros como parametro? talvez
 	return 0;
 }
 
+bool checaVitoria(const char *palavra, char letrasAdivinhadas[])
+{
+	int letrasCorretas = 0;
+	int lenPalavra = strlen(palavra);
+	for (int i = 0; i < lenPalavra; i++)
+	{
+		for(int j = 0; j < 26; j++)
+		{
+			if (palavra[i] == letrasAdivinhadas[j])
+			{
+				letrasCorretas++;
+			}
+		}
+	}
+	if (letrasCorretas == lenPalavra)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
 /*
 void validaUsuario() {
 	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
