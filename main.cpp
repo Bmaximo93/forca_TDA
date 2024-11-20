@@ -312,10 +312,6 @@ int desenhaForca(int erros) //passar erros como parametro? talvez não seja nece
 }
 
 /*
-void validaUsuario() {
-	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
-}
-
 void cadastrarPalavra() {
 	Adiciona uma palavra ao arquivo .txt (provavelmente usar fopen e fwrite)
 }
