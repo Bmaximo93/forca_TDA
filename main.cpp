@@ -17,13 +17,17 @@ void desenharMenu();
 void validaUsuario();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
-int validaLetra(const char *palavra, int *erros);
+int validaLetra(const char *palavra, int *erros, int *acertos);
 void desenhaGraficos(const char *palavra, char letrasAdvinhadas[]);
 int desenhaForca(int erros);
+int rodarPartida();
+bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
+void exibirCreditos();
 
-int acertouPalavra = 0, erros = 0;
+int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
 int numAdivinhacoes = 0;
+
 
 int main () {
 	setlocale(0, "Portuguese");
@@ -38,15 +42,7 @@ int main () {
 		switch (opcao) {
 			case 1: {
 				validaUsuario();
-				const char* palavraEscolhida = escolhePalavra();
-				printf("\n%s\n\n", palavraEscolhida);
-				while (!acertouPalavra && erros < 6) 
-				{
-					desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
-					validaLetra(palavraEscolhida, &erros);
-				}
-				// calculaPontuacao();
-				free((void*)palavraEscolhida);
+				rodarPartida();
 				}
 				break;
 			case 2:
@@ -56,7 +52,7 @@ int main () {
 				// cadastrarPalavra()
 				break;
 			case 4:
-				// exibirCreditos()
+				exibirCreditos();
 				break;
 			case 5:
 				printf("\n\nObrigado por jogar!");
@@ -67,6 +63,35 @@ int main () {
 		}
 	} while (opcao < 1 || opcao > 5);
 	
+	return 0;
+}
+
+int rodarPartida()
+{
+	
+	const char* palavraEscolhida = escolhePalavra();
+
+	while (!acertouPalavra && erros < 6) 
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		validaLetra(palavraEscolhida, &erros, &acertos);
+		if (checaVitoria(palavraEscolhida, letrasAdivinhadas))
+		{
+			acertouPalavra = true; // da pra otimizar isso, o acertouPalavra poderia ser definido direto na função checaVitoria sem precisar dessa condicional .BM
+		}
+	}
+	if(acertouPalavra) //professor se voce estiver vendo isso me desculpe
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		printf("\n\nVoce Acertou :)\n\n");
+	}
+	else
+	{
+		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+		printf("\n\nVoce Fracassou :(\n\n");
+	}
+	// calculaPontuacao();
+	free((void*)palavraEscolhida);
 	return 0;
 }
 
@@ -198,7 +223,7 @@ void validaUsuario() {
     }
 }
 
-int validaLetra(const char *palavra, int *erros)
+int validaLetra(const char *palavra, int *erros, int *acertos)
 {
 	char letra;
 
@@ -206,6 +231,7 @@ int validaLetra(const char *palavra, int *erros)
 
 		printf("\ninsira uma letra: ");
 		scanf(" %c", &letra);
+		fflush(stdin);
 		letra = toupper(letra);
 
 	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
@@ -216,7 +242,7 @@ int validaLetra(const char *palavra, int *erros)
 
 		if (letra == palavra[i])
 		{
-				
+			(*acertos)++;	
 			return i;
 		}
 
@@ -264,7 +290,8 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 	printf("\n\n");
 
 	desenhaForca(erros);
-
+	if (erros < 6)
+	{
 	for (int i = 0; i < strlen(palavra); i++)
 	{
 		bool letraEncontrada = false;
@@ -296,6 +323,15 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 		printf("%c ", letrasAdivinhadas[i]);
 	}
 	}
+	}
+	else
+	{
+		for (int i = 0; i < strlen(palavra); i++)
+		{
+			printf("%c ", palavra[i]);
+		}
+	}
+	
 
 }
 
@@ -311,6 +347,30 @@ int desenhaForca(int erros) //passar erros como parametro? talvez não seja nece
 	return 0;
 }
 
+bool checaVitoria(const char *palavra, char letrasAdivinhadas[])
+{
+	int letrasCorretas = 0;
+	int lenPalavra = strlen(palavra);
+	for (int i = 0; i < lenPalavra; i++)
+	{
+		for(int j = 0; j < 26; j++)
+		{
+			if (palavra[i] == letrasAdivinhadas[j])
+			{
+				letrasCorretas++;
+			}
+		}
+	}
+	if (letrasCorretas == lenPalavra)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
 /*
 void validaUsuario() {
 	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
@@ -328,7 +388,33 @@ void exibirRanking() {
 	Exibe o ranking de pontos
 }
 
-void exibirCreditos() {
-	Exibe os créditos
-}
+
 */
+void exibirCreditos() {
+    printf("======================================================\n");
+    printf("CRÉDITOS\n");
+    printf("======================================================\n");
+    printf("Desenvolvedores:\n");
+    printf("- Pedro Madruga\n");
+    printf("- Bruno Máximo\n");
+    printf("- Thales Santana\n");
+    printf("- Felipe Borras\n");
+    printf("======================================================\n");
+    printf("Objetivo do Trabalho:\n");
+    printf("Desenvolver um jogo da forca funcional, utilizando\n");
+    printf("a linguagem de programação C, com a possibilidade de\n");
+    printf("cadastro de novas palavras, além de um sistema de\n");
+    printf("cadastro de usuários e ranking entre os jogadores.\n");
+    printf("======================================================\n");
+    printf("Plataformas de Desenvolvimento:\n");
+    printf("- Visual Studio Code (VSCode)\n");
+    printf("- GitHub\n");
+    printf("======================================================\n");
+    printf("Este jogo foi desenvolvido para a disciplina:\n");
+    printf("- Técnicas e Desenvolvimento de Algoritmos\n");
+    printf("  Turma: C | Turno: Manhã\n");
+    printf("  Professor: Walace S. Bonfim\n");
+    printf("======================================================\n");
+    printf("Obrigado por jogar!\n");
+    printf("======================================================\n");
+}
