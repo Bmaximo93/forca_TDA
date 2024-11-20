@@ -22,6 +22,7 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[]);
 int desenhaForca(int erros);
 int rodarPartida();
 bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
+void exibirCreditos();
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
@@ -51,7 +52,7 @@ int main () {
 				// cadastrarPalavra()
 				break;
 			case 4:
-				// exibirCreditos()
+				exibirCreditos();
 				break;
 			case 5:
 				printf("\n\nObrigado por jogar!");
@@ -387,7 +388,33 @@ void exibirRanking() {
 	Exibe o ranking de pontos
 }
 
-void exibirCreditos() {
-	Exibe os créditos
-}
+
 */
+void exibirCreditos() {
+    printf("======================================================\n");
+    printf("CRÉDITOS\n");
+    printf("======================================================\n");
+    printf("Desenvolvedores:\n");
+    printf("- Pedro Madruga\n");
+    printf("- Bruno Máximo\n");
+    printf("- Thales Santana\n");
+    printf("- Felipe Borras\n");
+    printf("======================================================\n");
+    printf("Objetivo do Trabalho:\n");
+    printf("Desenvolver um jogo da forca funcional, utilizando\n");
+    printf("a linguagem de programação C, com a possibilidade de\n");
+    printf("cadastro de novas palavras, além de um sistema de\n");
+    printf("cadastro de usuários e ranking entre os jogadores.\n");
+    printf("======================================================\n");
+    printf("Plataformas de Desenvolvimento:\n");
+    printf("- Visual Studio Code (VSCode)\n");
+    printf("- GitHub\n");
+    printf("======================================================\n");
+    printf("Este jogo foi desenvolvido para a disciplina:\n");
+    printf("- Técnicas e Desenvolvimento de Algoritmos\n");
+    printf("  Turma: C | Turno: Manhã\n");
+    printf("  Professor: Walace S. Bonfim\n");
+    printf("======================================================\n");
+    printf("Obrigado por jogar!\n");
+    printf("======================================================\n");
+}
