@@ -67,6 +67,7 @@ int main () {
 	return 0;
 }
 
+
 void desenharMenu() {
 	printf("====================\n");
 	printf("1. Jogar\n");
@@ -122,7 +123,6 @@ const char* escolhePalavra() {
 }
 
 
-
 int validaLetra(const char *palavra, int *erros)
 {
 	char letra;
@@ -174,7 +174,7 @@ bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, 
 	return true;
 }
 
-void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
+void desenhaGraficos(const char *palavra, char letrasAdvinhadas[], bool gameover)
 {
 	
 
@@ -224,7 +224,7 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 
 }
 
-int desenhaForca(int erros) //passar erros como parametro? talvez não seja necessário, discutir
+int desenhaForca(int erros, bool gameover) //passar erros como parametro? talvez não seja necessário, discutir
 {
 	printf("  +---+\n");
 	printf("  |   |\n");
