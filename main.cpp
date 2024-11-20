@@ -14,15 +14,17 @@
 void desenharMenu();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
-int validaLetra(const char *palavra);
-void desenhaPalavra(const char *palavra, char letrasAdvinhadas[]);
+int validaLetra(const char *palavra, int *erros);
+void desenhaGraficos(const char *palavra, char letrasAdvinhadas[]);
+int desenhaForca(int erros);
 
+int acertouPalavra = 0, erros = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
 int numAdivinhacoes = 0;
 
 int main () {
 	setlocale(0, "Portuguese");
-	int acertouPalavra = 0, erros = 0, opcao;
+	int opcao;
 	
 	desenharMenu();
 	printf("Digite uma opção: ");
@@ -35,10 +37,10 @@ int main () {
 				// validaUsuario();
 				const char* palavraEscolhida = escolhePalavra();
 				printf("\n%s\n\n", palavraEscolhida);
-				while (!acertouPalavra && erros < 6) {
-					// desenhaForca();
-					desenhaPalavra(palavraEscolhida, letrasAdivinhadas);
-					validaLetra(palavraEscolhida);
+				while (!acertouPalavra && erros < 6) 
+				{
+					desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
+					validaLetra(palavraEscolhida, &erros);
 				}
 				// calculaPontuacao();
 				free((void*)palavraEscolhida);
@@ -121,15 +123,15 @@ const char* escolhePalavra() {
 
 
 
-int validaLetra(const char *palavra)
+int validaLetra(const char *palavra, int *erros)
 {
 	char letra;
 
 	do{
 
-	printf("\ninsira uma letra: ");
-	scanf(" %c", &letra);
-	letra = toupper(letra);
+		printf("\ninsira uma letra: ");
+		scanf(" %c", &letra);
+		letra = toupper(letra);
 
 	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
 	
@@ -145,6 +147,7 @@ int validaLetra(const char *palavra)
 
 	}
 	
+	(*erros)++;
 	return -1;
 }
 
@@ -171,18 +174,21 @@ bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, 
 	return true;
 }
 
-void desenhaPalavra(const char *palavra, char letrasAdvinhadas[])
+void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 {
 	
 
 	#ifdef _WIN32
-        system("cls");  // Windows-specific command
+        system("cls");  
     #else
-        system("clear");  // Unix/Linux/MacOS-specific command
+        system("clear"); 
     #endif
 
-	printf("(teste: a palavra é %s)",palavra);
+	printf("(teste: a palavra é %s)\n",palavra);
+	printf("(teste: n de erros %i)", erros);
 	printf("\n\n");
+
+	desenhaForca(erros);
 
 	for (int i = 0; i < strlen(palavra); i++)
 	{
@@ -218,7 +224,17 @@ void desenhaPalavra(const char *palavra, char letrasAdvinhadas[])
 
 }
 
-
+int desenhaForca(int erros) //passar erros como parametro? talvez não seja necessário, discutir
+{
+	printf("  +---+\n");
+	printf("  |   |\n");
+	printf("  %s   |\n", (erros >= 1) ? "O":" " );
+	printf(" %s%s%s  |\n", (erros >= 2) ? "/":" ",(erros >= 3) ? "|":" ",(erros >= 4) ? "\\":" " );
+	printf("  %s%s  |\n", (erros >= 5) ? "/":" ",(erros >= 6) ? "\\":" ");
+	printf("      |\n");
+	printf("=========   ");
+	return 0;
+}
 
 /*
 void validaUsuario() {
@@ -228,18 +244,6 @@ void validaUsuario() {
 void cadastrarPalavra() {
 	Adiciona uma palavra ao arquivo .txt (provavelmente usar fopen e fwrite)
 }
-
-void desenhaForca(erros) {
-	Alterar o desenho de acordo com a quantidade de erros
-  +---+
-  |   |
-  O   |
- /|\  |
- /\   |
-      |
-=========
-}
-
 
 void calculaPontuacao() {
 	Calcula a pontuação com base nos erros do usu�rio. Cada acerto de letra dá 100 pontos e cada letra errada perde 50. Acertar a palavra completa dá 300 pontos.
