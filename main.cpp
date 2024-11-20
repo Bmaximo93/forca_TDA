@@ -11,7 +11,10 @@
 #include <time.h>
 #include <string.h>
 
+#define MAX_NOME 50
+
 void desenharMenu();
+void validaUsuario();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
 int validaLetra(const char *palavra, int *erros);
@@ -34,7 +37,7 @@ int main () {
 		fflush(stdin);
 		switch (opcao) {
 			case 1: {
-				// validaUsuario();
+				validaUsuario();
 				const char* palavraEscolhida = escolhePalavra();
 				printf("\n%s\n\n", palavraEscolhida);
 				while (!acertouPalavra && erros < 6) 
@@ -121,7 +124,79 @@ const char* escolhePalavra() {
     return palavra_escolhida;
 }
 
+void validaUsuario() {
+    char nome[MAX_NOME];
+	char restante[MAX_NOME];
+    char nomeArquivo[MAX_NOME];
+    int pontuacao;
+    char resposta;
+    int encontrado = 0;
 
+    FILE *arquivo;
+
+    do {
+        printf("Digite o nome de usuário (apenas um nome, sem espaços): ");
+        if (scanf("%s", nome) == 1) {
+            // Verifica se há algo após o nome lido no buffer
+            if (scanf("%[^\n]", restante) == 1) { // Lê qualquer coisa após o nome
+                printf("Erro: Digite apenas um único nome, sem espaços.\n");
+                // Limpa o buffer caso tenha sobrado entrada
+                while (getchar() != '\n');
+            } else {
+                break; // Nome válido
+            }
+        } else {
+            printf("Erro na leitura do nome. Tente novamente.\n");
+            // Limpa o buffer de entrada
+            while (getchar() != '\n');
+        }
+    } while (1);
+
+    // Abrir o arquivo para leitura
+    arquivo = fopen("usuarios.txt", "r");
+
+    if (arquivo != NULL) {
+        // Procurar o nome do usuário no arquivo
+        while (fscanf(arquivo, "%s %d", nomeArquivo, &pontuacao) != EOF) {
+            if (strcmp(nome, nomeArquivo) == 0) {
+                encontrado = 1;
+                break;
+            }
+        }
+        fclose(arquivo);
+    }
+
+    if (encontrado) {
+        // Se o usuário foi encontrado
+        printf("Jogar como %s? (s/n): ", nome);
+        scanf(" %c", &resposta);
+        if (resposta == 's' || resposta == 'S') {
+            printf("Bem-vindo de volta, %s! Sua pontuação atual é %d.\n", nome, pontuacao);
+        } else {
+            printf("Operação cancelada.\n");
+			exit(1);
+        }
+    } else {
+        // Se o usuário não foi encontrado
+        printf("Usuário não encontrado. Deseja cadastrar? (s/n): ");
+        scanf(" %c", &resposta);
+        if (resposta == 's' || resposta == 'S') {
+            // Abrir o arquivo para adicionar um novo usuário
+            arquivo = fopen("usuarios.txt", "a");
+            if (arquivo != NULL) {
+                fprintf(arquivo, "%s 0\n", nome); // Novo usuário começa com pontuação 0
+                fclose(arquivo);
+                printf("Usuário %s cadastrado com sucesso!\n", nome);
+            } else {
+                printf("Erro ao abrir o arquivo para cadastro.\n");
+				exit(1);
+            }
+        } else {
+            printf("Operação cancelada.\n");
+			exit(1);
+        }
+    }
+}
 
 int validaLetra(const char *palavra, int *erros)
 {
@@ -257,4 +332,3 @@ void exibirCreditos() {
 	Exibe os créditos
 }
 */
-
