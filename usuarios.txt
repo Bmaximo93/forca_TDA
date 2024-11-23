@@ -1,1 +1,2 @@
 pedro 0
+bruno 0
