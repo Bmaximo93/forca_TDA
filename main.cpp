@@ -25,6 +25,7 @@ int rodarPartida();
 bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
 void exibirCreditos();
 void cadastrarPalavra();
+int palavraJaExiste(const char *palavra, const char *nomeArquivo);
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
@@ -406,6 +407,12 @@ void cadastrarPalavra() {
     }
     palavraConvertida[strlen(palavra)] = '\0';
 
+	// Verificar se a palavra já existe no arquivo
+    if (palavraJaExiste(palavraConvertida, "dict.txt")) {
+        printf("Erro: A palavra \"%s\" já está cadastrada no sistema.\n", palavraConvertida);
+        exit(1);
+    }
+
     // Abrir o arquivo em modo de adição
     FILE *arquivo = fopen("dict.txt", "a");
     if (arquivo == NULL) {
@@ -418,6 +425,27 @@ void cadastrarPalavra() {
     fclose(arquivo);
 
     printf("Palavra \"%s\" cadastrada com sucesso!\n", palavraConvertida);
+}
+
+int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
+    char linha[MAX_PALAVRA];
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
+        return 0;
+    }
+
+    while (fgets(linha, MAX_PALAVRA, arquivo) != NULL) {
+        // Remover o caractere de nova linha (\n) ao final da linha
+        linha[strcspn(linha, "\n")] = '\0';
+        if (strcmp(linha, palavra) == 0) {
+            fclose(arquivo);
+            return 1; // Palavra encontrada
+        }
+    }
+
+    fclose(arquivo);
+    return 0; // Palavra não encontrada
 }
 
 /*
