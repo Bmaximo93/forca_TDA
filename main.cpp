@@ -12,6 +12,7 @@
 #include <string.h>
 
 #define MAX_NOME 50
+#define MAX_PALAVRA 50
 
 void desenharMenu();
 void validaUsuario();
@@ -23,6 +24,7 @@ int desenhaForca(int erros);
 int rodarPartida();
 bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
 void exibirCreditos();
+void cadastrarPalavra();
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'}; 
@@ -49,7 +51,7 @@ int main () {
 				// Exibir Ranking
 				break;
 			case 3:
-				// cadastrarPalavra()
+				cadastrarPalavra();
 				break;
 			case 4:
 				exibirCreditos();
@@ -371,15 +373,54 @@ bool checaVitoria(const char *palavra, char letrasAdivinhadas[])
 	}
 
 }
-/*
-void validaUsuario() {
-	Pede o nome do usuário. Se não existir, opção de cadastrar. Se existir, confirmar entrada
-}
 
 void cadastrarPalavra() {
-	Adiciona uma palavra ao arquivo .txt (provavelmente usar fopen e fwrite)
+    char palavra[MAX_PALAVRA];
+    char palavraConvertida[MAX_PALAVRA];
+    int valida = 1;
+
+    printf("Digite a palavra que deseja cadastrar (sem acentos, sem cedilha, apenas letras): ");
+    scanf("%s", palavra);
+
+	if (strlen(palavra) < 6) {
+        printf("Erro: A palavra deve ter pelo menos 6 letras.\n");
+        exit(1);
+    }
+
+    // Validar a palavra
+    for (int i = 0; palavra[i] != '\0'; i++) {
+        if (!isalpha(palavra[i]) || strchr("çÇáàâãéèêíìîóòôõúùû", palavra[i]) != NULL) {
+            valida = 0;
+            break;
+        }
+    }
+
+    if (!valida) {
+        printf("Palavra inválida! Certifique-se de usar apenas letras sem acentos, sem cedilha e pelo menos 6 letras.\n");
+        exit (1);
+    }
+
+    // Converter para maiúsculas
+    for (int i = 0; palavra[i] != '\0'; i++) {
+        palavraConvertida[i] = toupper(palavra[i]);
+    }
+    palavraConvertida[strlen(palavra)] = '\0';
+
+    // Abrir o arquivo em modo de adição
+    FILE *arquivo = fopen("dict.txt", "a");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo dict.txt para escrita.\n");
+        exit(1);
+    }
+
+    // Escrever a palavra convertida no arquivo
+    fprintf(arquivo, "%s\n", palavraConvertida);
+    fclose(arquivo);
+
+    printf("Palavra \"%s\" cadastrada com sucesso!\n", palavraConvertida);
 }
 
+/*
 void calculaPontuacao() {
 	Calcula a pontuação com base nos erros do usu�rio. Cada acerto de letra dá 100 pontos e cada letra errada perde 50. Acertar a palavra completa dá 300 pontos.
 }
