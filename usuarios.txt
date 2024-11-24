@@ -1,2 +1,6 @@
-pedro 0
-bruno 0
+pedro 90
+bruno 1200
+joao 600
+thales 0
+borras 560
+vitor 520Joao 0

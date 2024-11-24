@@ -13,6 +13,12 @@
 
 #define MAX_NOME 50
 #define MAX_PALAVRA 50
+#define MAX_USUARIOS 100
+
+typedef struct {
+    char nome[MAX_NOME];
+    int pontuacao;
+} Usuario;
 
 void desenharMenu();
 void validaUsuario();
@@ -25,9 +31,12 @@ int rodarPartida();
 bool checaVitoria(const char *palavra, char letrasAdivinhadas[]);
 void exibirCreditos();
 void cadastrarPalavra();
+int palavraJaExiste(const char *palavra, const char *nomeArquivo);
+int comparaUsuarios(const void *a, const void *b);
+void exibeRanking();
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
-char letrasAdivinhadas[26] = {'\0'}; 
+char letrasAdivinhadas[26] = {'\0'};
 int numAdivinhacoes = 0;
 
 
@@ -48,7 +57,7 @@ int main () {
 				}
 				break;
 			case 2:
-				// Exibir Ranking
+				exibeRanking();
 				break;
 			case 3:
 				cadastrarPalavra();
@@ -222,6 +231,46 @@ void validaUsuario() {
             printf("Operação cancelada.\n");
 			exit(1);
         }
+    }
+}
+
+int comparaUsuarios(const void *a, const void *b) {
+    Usuario *usuarioA = (Usuario *)a;
+    Usuario *usuarioB = (Usuario *)b;
+
+    return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
+}
+
+void exibeRanking() {
+    FILE *arquivo;
+    Usuario usuarios[MAX_USUARIOS];
+    int totalUsuarios = 0;
+
+    // Abrir o arquivo para leitura
+    arquivo = fopen("usuarios.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro: Não foi possível abrir o arquivo usuarios.txt\n");
+        exit (1);
+    }
+
+    // Ler os dados do arquivo e armazenar no vetor
+    while (fscanf(arquivo, "%s %d", usuarios[totalUsuarios].nome, &usuarios[totalUsuarios].pontuacao) == 2) {
+        totalUsuarios++;
+        if (totalUsuarios >= MAX_USUARIOS) {
+            printf("Aviso: Número máximo de usuários excedido.\n");
+            break;
+        }
+    }
+
+    fclose(arquivo);
+
+    // Ordenar o vetor em ordem decrescente de pontuação
+    qsort(usuarios, totalUsuarios, sizeof(Usuario), comparaUsuarios);
+
+    // Exibir o ranking
+    printf("\n=== Ranking de Jogadores ===\n");
+    for (int i = 0; i < totalUsuarios; i++) {
+        printf("%s %d\n", usuarios[i].nome, usuarios[i].pontuacao);
     }
 }
 
@@ -406,6 +455,12 @@ void cadastrarPalavra() {
     }
     palavraConvertida[strlen(palavra)] = '\0';
 
+	// Verificar se a palavra já existe no arquivo
+    if (palavraJaExiste(palavraConvertida, "dict.txt")) {
+        printf("Erro: A palavra \"%s\" já está cadastrada no sistema.\n", palavraConvertida);
+        exit(1);
+    }
+
     // Abrir o arquivo em modo de adição
     FILE *arquivo = fopen("dict.txt", "a");
     if (arquivo == NULL) {
@@ -418,6 +473,27 @@ void cadastrarPalavra() {
     fclose(arquivo);
 
     printf("Palavra \"%s\" cadastrada com sucesso!\n", palavraConvertida);
+}
+
+int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
+    char linha[MAX_PALAVRA];
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
+        return 0;
+    }
+
+    while (fgets(linha, MAX_PALAVRA, arquivo) != NULL) {
+        // Remover o caractere de nova linha (\n) ao final da linha
+        linha[strcspn(linha, "\n")] = '\0';
+        if (strcmp(linha, palavra) == 0) {
+            fclose(arquivo);
+            return 1; // Palavra encontrada
+        }
+    }
+
+    fclose(arquivo);
+    return 0; // Palavra não encontrada
 }
 
 /*
