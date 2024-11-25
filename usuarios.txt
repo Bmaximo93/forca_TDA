@@ -1,6 +1,14 @@
 pedro 90
-bruno 1200
+bruno 3850
 joao 600
 thales 3550
 borras 560
 vitor 520
+teste 0
+teste2 0
+teste3 700
+teste4 700
+teste5 0
+teste6 700
+teste7 1550
+teste8 950
