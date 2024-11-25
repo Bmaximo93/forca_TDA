@@ -21,7 +21,7 @@ typedef struct {
 } Usuario;
 
 void desenharMenu();
-void validaUsuario();
+int validaUsuario();
 const char* escolhePalavra();
 bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, char letra);
 int validaLetra(const char *palavra, int *erros, int *acertos);
@@ -34,11 +34,12 @@ void cadastrarPalavra();
 int palavraJaExiste(const char *palavra, const char *nomeArquivo);
 int comparaUsuarios(const void *a, const void *b);
 void exibeRanking();
+void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int erros, bool acertouPalavra);
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'};
 int numAdivinhacoes = 0;
-
+int indiceUsuario = 0;
 
 int main () {
 	setlocale(0, "Portuguese");
@@ -52,7 +53,7 @@ int main () {
 		fflush(stdin);
 		switch (opcao) {
 			case 1: {
-				validaUsuario();
+				indiceUsuario = validaUsuario();
 				rodarPartida();
 				}
 				break;
@@ -91,7 +92,7 @@ int rodarPartida()
 			acertouPalavra = true; // da pra otimizar isso, o acertouPalavra poderia ser definido direto na função checaVitoria sem precisar dessa condicional .BM
 		}
 	}
-	if(acertouPalavra) //professor se voce estiver vendo isso me desculpe
+	if(acertouPalavra)
 	{
 		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
 		printf("\n\nVoce Acertou :)\n\n");
@@ -101,7 +102,8 @@ int rodarPartida()
 		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
 		printf("\n\nVoce Fracassou :(\n\n");
 	}
-	// calculaPontuacao();
+	atualizaPontuacao("usuarios.txt", indiceUsuario, acertos, erros, acertouPalavra);
+
 	free((void*)palavraEscolhida);
 	return 0;
 }
@@ -160,16 +162,18 @@ const char* escolhePalavra() {
     return palavra_escolhida;
 }
 
-void validaUsuario() {
+int validaUsuario() {
     char nome[MAX_NOME];
-	char restante[MAX_NOME];
+    char restante[MAX_NOME];
     char nomeArquivo[MAX_NOME];
     int pontuacao;
     char resposta;
     int encontrado = 0;
+    int linhaAtual = 0;  // Rastreador de linha
 
     FILE *arquivo;
 
+    // Entrada do nome de usuário com validação
     do {
         printf("Digite o nome de usuário (apenas um nome, sem espaços): ");
         if (scanf("%s", nome) == 1) {
@@ -198,6 +202,7 @@ void validaUsuario() {
                 encontrado = 1;
                 break;
             }
+            linhaAtual++;  // Incrementa o número da linha
         }
         fclose(arquivo);
     }
@@ -208,9 +213,10 @@ void validaUsuario() {
         scanf(" %c", &resposta);
         if (resposta == 's' || resposta == 'S') {
             printf("Bem-vindo de volta, %s! Sua pontuação atual é %d.\n", nome, pontuacao);
+            return linhaAtual;  // Retorna o índice da linha do usuário
         } else {
             printf("Operação cancelada.\n");
-			exit(1);
+            exit(1);
         }
     } else {
         // Se o usuário não foi encontrado
@@ -223,22 +229,16 @@ void validaUsuario() {
                 fprintf(arquivo, "%s 0\n", nome); // Novo usuário começa com pontuação 0
                 fclose(arquivo);
                 printf("Usuário %s cadastrado com sucesso!\n", nome);
+                return -1; // Retorna -1 para indicar que é um novo usuário
             } else {
                 printf("Erro ao abrir o arquivo para cadastro.\n");
-				exit(1);
+                exit(1);
             }
         } else {
             printf("Operação cancelada.\n");
-			exit(1);
+            exit(1);
         }
     }
-}
-
-int comparaUsuarios(const void *a, const void *b) {
-    Usuario *usuarioA = (Usuario *)a;
-    Usuario *usuarioB = (Usuario *)b;
-
-    return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
 }
 
 void exibeRanking() {
@@ -272,6 +272,13 @@ void exibeRanking() {
     for (int i = 0; i < totalUsuarios; i++) {
         printf("%s %d\n", usuarios[i].nome, usuarios[i].pontuacao);
     }
+}
+
+int comparaUsuarios(const void *a, const void *b) {
+    Usuario *usuarioA = (Usuario *)a;
+    Usuario *usuarioB = (Usuario *)b;
+
+    return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
 }
 
 int validaLetra(const char *palavra, int *erros, int *acertos)
@@ -475,6 +482,68 @@ void cadastrarPalavra() {
     printf("Palavra \"%s\" cadastrada com sucesso!\n", palavraConvertida);
 }
 
+int calculaPontuacao(int acertos, int erros, bool vitoria) {
+	int pontuacaoTotal;
+	int pontuacaoErros = 50 * erros;
+	int pontuacaoAcertos = 100 * acertos;
+	if(vitoria){
+		pontuacaoTotal = (pontuacaoAcertos - pontuacaoErros) + 300;
+	} else {
+		pontuacaoTotal = pontuacaoAcertos - pontuacaoErros;
+	}
+
+	return pontuacaoTotal;
+}
+
+void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int erros, bool acertouPalavra) {
+    FILE* file = fopen(arquivo, "r+");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo: %s\n", arquivo);
+        return;
+    }
+
+    char linha[100]; // Para armazenar linhas do arquivo
+    char nome[50];
+    int pontuacao;
+    int linhaAtual = 0;
+    int pontosAdicionais = calculaPontuacao(acertos, erros, acertouPalavra);
+
+    // Cria um arquivo temporário para armazenar as alterações
+    FILE* tempFile = fopen("temp.txt", "w");
+    if (tempFile == NULL) {
+        printf("Erro ao criar arquivo temporário.\n");
+        fclose(file);
+        return;
+    }
+
+    // Lê o arquivo original linha por linha
+    while (fgets(linha, sizeof(linha), file) != NULL) {
+        // Analisa a linha para obter nome e pontuação
+        if (sscanf(linha, "%s %d", nome, &pontuacao) == 2) {
+            if (linhaAtual == indiceUsuario) {
+                // Atualiza a pontuação se for a linha correta
+                pontuacao += pontosAdicionais;
+                fprintf(tempFile, "%s %d\n", nome, pontuacao);
+                printf("Pontuação de %s atualizada com sucesso para %d pontos!\n", nome, pontuacao);
+            } else {
+                // Copia a linha sem alterações
+                fprintf(tempFile, "%s %d\n", nome, pontuacao);
+            }
+        } else {
+            // Copia linhas mal formatadas ou vazias sem alteração
+            fprintf(tempFile, "%s", linha);
+        }
+        linhaAtual++;
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    // Substitui o arquivo original pelo temporário
+    remove(arquivo);
+    rename("temp.txt", arquivo);
+}
+
 int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
     char linha[MAX_PALAVRA];
     FILE *arquivo = fopen(nomeArquivo, "r");
@@ -497,10 +566,6 @@ int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
 }
 
 /*
-void calculaPontuacao() {
-	Calcula a pontuação com base nos erros do usu�rio. Cada acerto de letra dá 100 pontos e cada letra errada perde 50. Acertar a palavra completa dá 300 pontos.
-}
-
 void exibirRanking() {
 	Exibe o ranking de pontos
 }
