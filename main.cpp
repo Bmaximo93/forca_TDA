@@ -19,7 +19,6 @@ typedef struct {
     char nome[MAX_NOME];
     int pontuacao;
 } Usuario;
-#define MAX_USUARIOS 100
 
 void desenharMenu();
 int validaUsuario();
@@ -59,7 +58,6 @@ int main () {
 				}
 				break;
 			case 2:
-				exibeRanking();
 				exibeRanking();
 				break;
 			case 3:
@@ -463,12 +461,6 @@ void cadastrarPalavra() {
         palavraConvertida[i] = toupper(palavra[i]);
     }
     palavraConvertida[strlen(palavra)] = '\0';
-
-	// Verificar se a palavra já existe no arquivo
-    if (palavraJaExiste(palavraConvertida, "dict.txt")) {
-        printf("Erro: A palavra \"%s\" já está cadastrada no sistema.\n", palavraConvertida);
-        exit(1);
-    }
 
 	// Verificar se a palavra já existe no arquivo
     if (palavraJaExiste(palavraConvertida, "dict.txt")) {
