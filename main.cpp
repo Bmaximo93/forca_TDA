@@ -19,6 +19,12 @@ typedef struct {
     char nome[MAX_NOME];
     int pontuacao;
 } Usuario;
+#define MAX_USUARIOS 100
+
+typedef struct {
+    char nome[MAX_NOME];
+    int pontuacao;
+} Usuario;
 
 void desenharMenu();
 int validaUsuario();
@@ -37,7 +43,7 @@ void exibeRanking();
 void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int erros, bool acertouPalavra);
 
 int acertouPalavra = 0, erros = 0, acertos = 0;
-char letrasAdivinhadas[26] = {'\0'}; 
+char letrasAdivinhadas[26] = {'\0'};
 int numAdivinhacoes = 0;
 int indiceUsuario = 0;
 
@@ -58,6 +64,7 @@ int main () {
 				}
 				break;
 			case 2:
+				exibeRanking();
 				exibeRanking();
 				break;
 			case 3:
@@ -281,6 +288,46 @@ void exibeRanking() {
     }
 }
 
+int comparaUsuarios(const void *a, const void *b) {
+    Usuario *usuarioA = (Usuario *)a;
+    Usuario *usuarioB = (Usuario *)b;
+
+    return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
+}
+
+void exibeRanking() {
+    FILE *arquivo;
+    Usuario usuarios[MAX_USUARIOS];
+    int totalUsuarios = 0;
+
+    // Abrir o arquivo para leitura
+    arquivo = fopen("usuarios.txt", "r");
+    if (arquivo == NULL) {
+        printf("Erro: Não foi possível abrir o arquivo usuarios.txt\n");
+        exit (1);
+    }
+
+    // Ler os dados do arquivo e armazenar no vetor
+    while (fscanf(arquivo, "%s %d", usuarios[totalUsuarios].nome, &usuarios[totalUsuarios].pontuacao) == 2) {
+        totalUsuarios++;
+        if (totalUsuarios >= MAX_USUARIOS) {
+            printf("Aviso: Número máximo de usuários excedido.\n");
+            break;
+        }
+    }
+
+    fclose(arquivo);
+
+    // Ordenar o vetor em ordem decrescente de pontuação
+    qsort(usuarios, totalUsuarios, sizeof(Usuario), comparaUsuarios);
+
+    // Exibir o ranking
+    printf("\n=== Ranking de Jogadores ===\n");
+    for (int i = 0; i < totalUsuarios; i++) {
+        printf("%s %d\n", usuarios[i].nome, usuarios[i].pontuacao);
+    }
+}
+
 int validaLetra(const char *palavra, int *erros, int *acertos)
 {
 	char letra;
@@ -461,6 +508,12 @@ void cadastrarPalavra() {
         palavraConvertida[i] = toupper(palavra[i]);
     }
     palavraConvertida[strlen(palavra)] = '\0';
+
+	// Verificar se a palavra já existe no arquivo
+    if (palavraJaExiste(palavraConvertida, "dict.txt")) {
+        printf("Erro: A palavra \"%s\" já está cadastrada no sistema.\n", palavraConvertida);
+        exit(1);
+    }
 
     // Abrir o arquivo em modo de adição
     FILE *arquivo = fopen("dict.txt", "a");
