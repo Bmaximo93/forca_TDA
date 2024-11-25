@@ -11,6 +11,12 @@
 #include <time.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 #define MAX_NOME 50
 #define MAX_PALAVRA 50
 #define MAX_USUARIOS 100
@@ -35,7 +41,11 @@ int palavraJaExiste(const char *palavra, const char *nomeArquivo);
 int comparaUsuarios(const void *a, const void *b);
 void exibeRanking();
 void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int erros, bool acertouPalavra);
+void cpSleep(int segundos);
+void cpClear();
+void voltarMenu();
 
+//
 int acertouPalavra = 0, erros = 0, acertos = 0;
 char letrasAdivinhadas[26] = {'\0'};
 int numAdivinhacoes = 0;
@@ -45,35 +55,53 @@ int main () {
 	setlocale(0, "Portuguese");
 	int opcao;
 	
-	desenharMenu();
-	printf("Digite uma opção: ");
 	
 	do {
+
+		//reinicia variaveis
+		acertouPalavra = 0;
+		erros = 0;
+		acertos = 0;
+		memset(letrasAdivinhadas, '\0', sizeof(letrasAdivinhadas));
+		numAdivinhacoes = 0;
+
+		desenharMenu();
+		printf("Digite uma opção: ");
+
 		scanf("%d", &opcao);
 		fflush(stdin);
-		switch (opcao) {
+		switch (opcao) 
+		{
 			case 1: {
 				indiceUsuario = validaUsuario();
 				rodarPartida();
 				}
+				voltarMenu();
 				break;
 			case 2:
+				cpClear();
 				exibeRanking();
+				voltarMenu();
 				break;
 			case 3:
+				cpClear();
 				cadastrarPalavra();
+				voltarMenu();
 				break;
 			case 4:
+				cpClear();
 				exibirCreditos();
+				voltarMenu();
 				break;
 			case 5:
-				printf("\n\nObrigado por jogar!");
+				cpClear();
+				printf("\n\nObrigado por jogar!\n\n");
 				return 1;
 				break;
 			default:
 				printf("Digite um valor válido: ");
 		}
-	} while (opcao < 1 || opcao > 5);
+	} while(true);
 	
 	return 0;
 }
@@ -87,20 +115,19 @@ int rodarPartida()
 	{
 		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
 		validaLetra(palavraEscolhida, &erros, &acertos);
-		if (checaVitoria(palavraEscolhida, letrasAdivinhadas))
-		{
-			acertouPalavra = true; // da pra otimizar isso, o acertouPalavra poderia ser definido direto na função checaVitoria sem precisar dessa condicional .BM
-		}
+		acertouPalavra = checaVitoria(palavraEscolhida, letrasAdivinhadas);
 	}
 	if(acertouPalavra)
 	{
 		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
 		printf("\n\nVoce Acertou :)\n\n");
+		cpSleep(2);
 	}
 	else
 	{
 		desenhaGraficos(palavraEscolhida, letrasAdivinhadas);
 		printf("\n\nVoce Fracassou :(\n\n");
+		cpSleep(2);
 	}
 	atualizaPontuacao("usuarios.txt", indiceUsuario, acertos, erros, acertouPalavra);
 
@@ -122,6 +149,7 @@ const char* escolhePalavra() {
     FILE* arquivo_palavras = fopen("dict.txt", "r");
     if (!arquivo_palavras) {
         printf("Erro ao abrir o arquivo\n");
+		cpSleep(1);
         return NULL;
     }
 
@@ -134,6 +162,7 @@ const char* escolhePalavra() {
     if (total_palavras == 0) {
         printf("Arquivo vazio ou sem palavras válidas.\n");
         fclose(arquivo_palavras);
+		cpSleep(1);
         return NULL;
     }
 
@@ -150,6 +179,7 @@ const char* escolhePalavra() {
             if (!palavra_escolhida) {
                 printf("Erro de alocação de memória.\n");
                 fclose(arquivo_palavras);
+				cpSleep(1);
                 return NULL;
             }
             strcpy(palavra_escolhida, buffer);
@@ -182,6 +212,7 @@ int validaUsuario() {
                 printf("Erro: Digite apenas um único nome, sem espaços.\n");
                 // Limpa o buffer caso tenha sobrado entrada
                 while (getchar() != '\n');
+				cpSleep(1);
             } else {
                 break; // Nome válido
             }
@@ -189,6 +220,7 @@ int validaUsuario() {
             printf("Erro na leitura do nome. Tente novamente.\n");
             // Limpa o buffer de entrada
             while (getchar() != '\n');
+			cpSleep(1);
         }
     } while (1);
 
@@ -212,10 +244,13 @@ int validaUsuario() {
         printf("Jogar como %s? (s/n): ", nome);
         scanf(" %c", &resposta);
         if (resposta == 's' || resposta == 'S') {
-            printf("Bem-vindo de volta, %s! Sua pontuação atual é %d.\n", nome, pontuacao);
+			cpClear();
+            printf("\n\nBem-vindo de volta, %s! Sua pontuação atual é %d.\n\n", nome, pontuacao);
+			cpSleep(3);
             return linhaAtual;  // Retorna o índice da linha do usuário
         } else {
             printf("Operação cancelada.\n");
+			cpSleep(1);
             exit(1);
         }
     } else {
@@ -229,13 +264,16 @@ int validaUsuario() {
                 fprintf(arquivo, "%s 0\n", nome); // Novo usuário começa com pontuação 0
                 fclose(arquivo);
                 printf("Usuário %s cadastrado com sucesso!\n", nome);
-                return -1; // Retorna -1 para indicar que é um novo usuário
+				cpSleep(1);
+                return linhaAtual; //retorna a linha do novo usuário
             } else {
                 printf("Erro ao abrir o arquivo para cadastro.\n");
+				cpSleep(1);
                 exit(1);
             }
         } else {
             printf("Operação cancelada.\n");
+			cpSleep(1);
             exit(1);
         }
     }
@@ -250,6 +288,7 @@ void exibeRanking() {
     arquivo = fopen("usuarios.txt", "r");
     if (arquivo == NULL) {
         printf("Erro: Não foi possível abrir o arquivo usuarios.txt\n");
+		cpSleep(1);
         exit (1);
     }
 
@@ -258,6 +297,7 @@ void exibeRanking() {
         totalUsuarios++;
         if (totalUsuarios >= MAX_USUARIOS) {
             printf("Aviso: Número máximo de usuários excedido.\n");
+			cpSleep(1);
             break;
         }
     }
@@ -284,7 +324,9 @@ int comparaUsuarios(const void *a, const void *b) {
 int validaLetra(const char *palavra, int *erros, int *acertos)
 {
 	char letra;
-
+	
+	//até que a letra inserida seja válida:
+	//pede que o usuário insira uma letra, limpa o buffer para que apenas uma letra seja lida, registra a letra inserida em maiúscula
 	do{
 
 		printf("\ninsira uma letra: ");
@@ -292,9 +334,9 @@ int validaLetra(const char *palavra, int *erros, int *acertos)
 		fflush(stdin);
 		letra = toupper(letra);
 
-	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra));
+	}while(!atualizarLetrasAdivinhadas(letrasAdivinhadas, &numAdivinhacoes, letra)); //verifica se letra inserida é válida
 	
-		
+	//verifica se a letra inserida está na palavra, incrementa acertos e retorna o indice caso sim, caso não, incrementa a contagem de erros	
 	for (int i = 0; i < strlen(palavra); i++)
 	{
 
@@ -323,7 +365,7 @@ bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, 
 
 		if (letrasAdivinhadas[i] == letra)
 		{
-			printf("\na letra %c já foi inserida\n", letra);
+			printf("a letra %c já foi inserida!\n", letra);
 			return false;
 		}
 		
@@ -336,24 +378,20 @@ bool atualizarLetrasAdivinhadas(char letrasAdivinhadas[], int *numAdivinhacoes, 
 void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 {
 	
+	//limpa o terminal
+	cpClear();
 
-	#ifdef _WIN32
-        system("cls");  
-    #else
-        system("clear"); 
-    #endif
-
-	printf("(teste: a palavra é %s)\n",palavra);
-	printf("(teste: n de erros %i)", erros);
 	printf("\n\n");
 
 	desenhaForca(erros);
+
+	// insere as letras que foram encontradas pelo jogador, insere barra para letras que não foram encontradas
 	if (erros < 6)
 	{
 	for (int i = 0; i < strlen(palavra); i++)
 	{
 		bool letraEncontrada = false;
-
+		
 		for (int j = 0; letrasAdvinhadas[j] != '\0'; j++)
 		{
 			if (palavra[i] == letrasAdvinhadas[j])
@@ -372,17 +410,21 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 		printf(" ");
 	}
 
+	//mostra ao jogador quais letras foram adivinhadas até agora
 	printf("\n");
 	if(letrasAdivinhadas[0] != '\0')
 	{
+
 	printf("\nletras inseridas: ");
+
 	for(int i = 0; i < letrasAdivinhadas[i] != '\0'; i++)
 	{
 		printf("%c ", letrasAdivinhadas[i]);
 	}
 	}
+
 	}
-	else
+	else //caso o jogador tenha perdido o jogo, mostrar a palavra por completo
 	{
 		for (int i = 0; i < strlen(palavra); i++)
 		{
@@ -393,7 +435,7 @@ void desenhaGraficos(const char *palavra, char letrasAdvinhadas[])
 
 }
 
-int desenhaForca(int erros) //passar erros como parametro? talvez não seja necessário, discutir
+int desenhaForca(int erros)
 {
 	printf("  +---+\n");
 	printf("  |   |\n");
@@ -440,6 +482,7 @@ void cadastrarPalavra() {
 
 	if (strlen(palavra) < 6) {
         printf("Erro: A palavra deve ter pelo menos 6 letras.\n");
+		cpSleep(1);
         exit(1);
     }
 
@@ -453,6 +496,7 @@ void cadastrarPalavra() {
 
     if (!valida) {
         printf("Palavra inválida! Certifique-se de usar apenas letras sem acentos, sem cedilha e pelo menos 6 letras.\n");
+		cpSleep(2);
         exit (1);
     }
 
@@ -465,6 +509,7 @@ void cadastrarPalavra() {
 	// Verificar se a palavra já existe no arquivo
     if (palavraJaExiste(palavraConvertida, "dict.txt")) {
         printf("Erro: A palavra \"%s\" já está cadastrada no sistema.\n", palavraConvertida);
+		cpSleep(2);
         exit(1);
     }
 
@@ -472,6 +517,7 @@ void cadastrarPalavra() {
     FILE *arquivo = fopen("dict.txt", "a");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo dict.txt para escrita.\n");
+		cpSleep(2);
         exit(1);
     }
 
@@ -480,6 +526,7 @@ void cadastrarPalavra() {
     fclose(arquivo);
 
     printf("Palavra \"%s\" cadastrada com sucesso!\n", palavraConvertida);
+	cpSleep(2);
 }
 
 int calculaPontuacao(int acertos, int erros, bool vitoria) {
@@ -499,6 +546,7 @@ void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int 
     FILE* file = fopen(arquivo, "r+");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo: %s\n", arquivo);
+		cpSleep(1);
         return;
     }
 
@@ -512,6 +560,7 @@ void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int 
     FILE* tempFile = fopen("temp.txt", "w");
     if (tempFile == NULL) {
         printf("Erro ao criar arquivo temporário.\n");
+		cpSleep(1);
         fclose(file);
         return;
     }
@@ -523,8 +572,13 @@ void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int 
             if (linhaAtual == indiceUsuario) {
                 // Atualiza a pontuação se for a linha correta
                 pontuacao += pontosAdicionais;
+				if (pontuacao < 0)
+				{
+					pontuacao = 0;
+				}
                 fprintf(tempFile, "%s %d\n", nome, pontuacao);
                 printf("Pontuação de %s atualizada com sucesso para %d pontos!\n", nome, pontuacao);
+				cpSleep(1);
             } else {
                 // Copia a linha sem alterações
                 fprintf(tempFile, "%s %d\n", nome, pontuacao);
@@ -549,6 +603,7 @@ int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
     FILE *arquivo = fopen(nomeArquivo, "r");
     if (arquivo == NULL) {
         printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
+		cpSleep(1);
         return 0;
     }
 
@@ -565,13 +620,6 @@ int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
     return 0; // Palavra não encontrada
 }
 
-/*
-void exibirRanking() {
-	Exibe o ranking de pontos
-}
-
-
-*/
 void exibirCreditos() {
     printf("======================================================\n");
     printf("CRÉDITOS\n");
@@ -599,4 +647,47 @@ void exibirCreditos() {
     printf("======================================================\n");
     printf("Obrigado por jogar!\n");
     printf("======================================================\n");
+	cpSleep(2);
+}
+
+void cpSleep(int segundos)
+{
+#ifdef _WIN32
+    Sleep(segundos * 1000); //caso o sistema seja WINDOWS
+#else
+    sleep(segundos); //caso o sistema seja LINUX/MACOS
+#endif
+}
+
+void cpClear()
+{
+	#ifdef _WIN32
+        system("cls");  //caso o sistema seja WINDOWS
+    #else
+        system("clear"); //caso o sistema seja LINUX/MACOS
+    #endif
+}
+
+void voltarMenu() {
+    char resposta;
+
+    while (1) { // Loop para validar a entrada do usuário
+        printf("\nDeseja voltar ao menu? (s/n): ");
+        scanf(" %c", &resposta);
+
+        resposta = toupper(resposta); 
+        if (resposta == 'S') {
+            // limpa o terminal e retorna normalmente, permitindo que o programa continue
+			cpClear();
+            return;
+        } else if (resposta == 'N') {
+            // Sai do programa
+            printf("\nEncerrando o programa...\n");
+			cpSleep(2);
+            exit(0);
+        } else {
+            // Entrada inválida, solicita novamente
+            printf("Entrada inválida. Por favor, digite 's' ou 'n'.\n");
+        }
+    }
 }
