@@ -1,6 +1,6 @@
 pedro 90
 bruno 1200
 joao 600
-thales 2700
+thales 3550
 borras 560
 vitor 520

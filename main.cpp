@@ -19,12 +19,6 @@ typedef struct {
     char nome[MAX_NOME];
     int pontuacao;
 } Usuario;
-#define MAX_USUARIOS 100
-
-typedef struct {
-    char nome[MAX_NOME];
-    int pontuacao;
-} Usuario;
 
 void desenharMenu();
 int validaUsuario();
@@ -64,7 +58,6 @@ int main () {
 				}
 				break;
 			case 2:
-				exibeRanking();
 				exibeRanking();
 				break;
 			case 3:
@@ -248,13 +241,6 @@ int validaUsuario() {
     }
 }
 
-int comparaUsuarios(const void *a, const void *b) {
-    Usuario *usuarioA = (Usuario *)a;
-    Usuario *usuarioB = (Usuario *)b;
-
-    return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
-}
-
 void exibeRanking() {
     FILE *arquivo;
     Usuario usuarios[MAX_USUARIOS];
@@ -293,39 +279,6 @@ int comparaUsuarios(const void *a, const void *b) {
     Usuario *usuarioB = (Usuario *)b;
 
     return usuarioB->pontuacao - usuarioA->pontuacao; // Decrescente
-}
-
-void exibeRanking() {
-    FILE *arquivo;
-    Usuario usuarios[MAX_USUARIOS];
-    int totalUsuarios = 0;
-
-    // Abrir o arquivo para leitura
-    arquivo = fopen("usuarios.txt", "r");
-    if (arquivo == NULL) {
-        printf("Erro: Não foi possível abrir o arquivo usuarios.txt\n");
-        exit (1);
-    }
-
-    // Ler os dados do arquivo e armazenar no vetor
-    while (fscanf(arquivo, "%s %d", usuarios[totalUsuarios].nome, &usuarios[totalUsuarios].pontuacao) == 2) {
-        totalUsuarios++;
-        if (totalUsuarios >= MAX_USUARIOS) {
-            printf("Aviso: Número máximo de usuários excedido.\n");
-            break;
-        }
-    }
-
-    fclose(arquivo);
-
-    // Ordenar o vetor em ordem decrescente de pontuação
-    qsort(usuarios, totalUsuarios, sizeof(Usuario), comparaUsuarios);
-
-    // Exibir o ranking
-    printf("\n=== Ranking de Jogadores ===\n");
-    for (int i = 0; i < totalUsuarios; i++) {
-        printf("%s %d\n", usuarios[i].nome, usuarios[i].pontuacao);
-    }
 }
 
 int validaLetra(const char *palavra, int *erros, int *acertos)
@@ -591,6 +544,26 @@ void atualizaPontuacao(const char* arquivo, int indiceUsuario, int acertos, int 
     rename("temp.txt", arquivo);
 }
 
+int palavraJaExiste(const char *palavra, const char *nomeArquivo) {
+    char linha[MAX_PALAVRA];
+    FILE *arquivo = fopen(nomeArquivo, "r");
+    if (arquivo == NULL) {
+        printf("Erro ao abrir o arquivo %s.\n", nomeArquivo);
+        return 0;
+    }
+
+    while (fgets(linha, MAX_PALAVRA, arquivo) != NULL) {
+        // Remover o caractere de nova linha (\n) ao final da linha
+        linha[strcspn(linha, "\n")] = '\0';
+        if (strcmp(linha, palavra) == 0) {
+            fclose(arquivo);
+            return 1; // Palavra encontrada
+        }
+    }
+
+    fclose(arquivo);
+    return 0; // Palavra não encontrada
+}
 
 /*
 void exibirRanking() {
